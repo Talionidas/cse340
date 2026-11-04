@@ -1,3 +1,4 @@
+import { testConnection } from './src/models/db.js';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -51,7 +52,12 @@ app.get('/categories', async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
-    console.log(`Server is running at http://127.0.0.1:${PORT}`);
-    console.log(`Environment: ${NODE_ENV}`);
+app.listen(PORT, async () => {
+    try {
+        await testConnection();
+        console.log(`Server is running at http://127.0.0.1:${PORT}`);
+        console.log(`Environment: ${NODE_ENV}`);
+    } catch (error) {
+        console.error('Error connecting to the database:', error);
+    }
 });
