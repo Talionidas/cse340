@@ -55,3 +55,61 @@ VALUES
 (3, 'Senior Community Visit', 'Spend time with seniors and assist with daily activities.', 'Aarau', '2026-12-10'),
 (3, 'Holiday Gift Collection', 'Collect holiday gifts for children in need.', 'Lenzburg', '2026-12-17'),
 (3, 'Community Cleanup Event', 'Organize volunteers to clean public spaces.', 'Lucerne', '2027-01-16');
+
+
+-- ========================================
+-- Category Table
+-- ========================================
+CREATE TABLE category (
+    category_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- ========================================
+-- Project Category Junction Table
+-- ========================================
+CREATE TABLE project_category (
+    project_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+    PRIMARY KEY (project_id, category_id),
+    FOREIGN KEY (project_id) REFERENCES service_project(project_id),
+    FOREIGN KEY (category_id) REFERENCES category(category_id)
+);
+
+-- ========================================
+-- Insert sample categories
+-- ========================================
+INSERT INTO category (name)
+VALUES
+('Construction and Repairs'),
+('Environment and Sustainability'),
+('Community Support'),
+('Education and Workshops'),
+('Food and Agriculture');
+
+
+-- ========================================
+-- Assign categories to service projects
+-- ========================================
+INSERT INTO project_category (project_id, category_id)
+SELECT sp.project_id, c.category_id
+FROM (
+    VALUES
+    ('Community Playground Renovation', 'Construction and Repairs'),
+    ('Neighborhood Home Repairs', 'Construction and Repairs'),
+    ('Community Center Painting', 'Construction and Repairs'),
+    ('Accessible Ramp Construction', 'Construction and Repairs'),
+    ('Public Park Bench Restoration', 'Construction and Repairs'),
+    ('Urban Garden Planting', 'Food and Agriculture'),
+    ('Food Sustainability Workshop', 'Education and Workshops'),
+    ('Community Composting Day', 'Environment and Sustainability'),
+    ('School Garden Project', 'Food and Agriculture'),
+    ('Neighborhood Seed Exchange', 'Food and Agriculture'),
+    ('Winter Clothing Drive', 'Community Support'),
+    ('Food Bank Volunteer Day', 'Community Support'),
+    ('Senior Community Visit', 'Community Support'),
+    ('Holiday Gift Collection', 'Community Support'),
+    ('Community Cleanup Event', 'Environment and Sustainability')
+) AS assignments(project_title, category_name)
+JOIN service_project sp ON sp.title = assignments.project_title
+JOIN category c ON c.name = assignments.category_name;
