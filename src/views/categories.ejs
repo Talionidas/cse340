@@ -1,14 +1,21 @@
 <%- include('partials/header') %>
+
 <main>
     <h1><%= title %></h1>
-    <p>Explore the different types of service projects available in our community.</p>
 
-    <ul class="category-grid">
-        <% categories.forEach(category => { %>
-            <li>
-                <h2><%= category.name %></h2>
-            </li>
-        <% }); %>
-    </ul>
+    <% if (categories.length > 0) { %>
+        <ul>
+            <% categories.forEach(category => { %>
+                <li>
+                    <a href="/category/<%= category.category_id %>">
+                        <%= category.name %>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No categories are currently available.</p>
+    <% } %>
 </main>
+
 <%- include('partials/footer') %>
