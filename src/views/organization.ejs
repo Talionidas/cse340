@@ -1,13 +1,28 @@
 <%- include('partials/header') %>
 
 <main>
-    <h1><%= organizationDetails.name %></h1>
+    <h1><%= organization.name %></h1>
 
-    <img src="/images/<%= organizationDetails.logo_filename %>"
-         alt="<%= organizationDetails.name %> logo">
+    <img
+        src="/images/<%= organization.logo_filename %>"
+        alt="<%= organization.name %> logo"
+        width="200"
+    >
 
-    <p><%= organizationDetails.description %></p>
-    <p>Contact: <%= organizationDetails.contact_email %></p>
+    <p><%= organization.description %></p>
+
+    <p>
+        Contact:
+        <a href="mailto:<%= organization.contact_email %>">
+            <%= organization.contact_email %>
+        </a>
+    </p>
+
+    <p>
+        <a href="/edit-organization/<%= organization.organization_id %>">
+            Edit Organization
+        </a>
+    </p>
 
     <h2>Service Projects</h2>
 
@@ -18,14 +33,17 @@
                     <a href="/project/<%= project.project_id %>">
                         <%= project.title %>
                     </a>
-                    <p><%= project.description %></p>
-                    <p>Location: <%= project.location %></p>
+                    <% if (project.date) { %>
+                        - <%= new Date(project.date).toLocaleDateString('en-US') %>
+                    <% } %>
                 </li>
             <% }); %>
         </ul>
     <% } else { %>
-        <p>No service projects are currently available.</p>
+        <p>No service projects are available for this organization.</p>
     <% } %>
+
+    <p><a href="/organizations">Back to Organizations</a></p>
 </main>
 
 <%- include('partials/footer') %>

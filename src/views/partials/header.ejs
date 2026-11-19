@@ -6,6 +6,18 @@
     <title><%= title %> | CSE 340 Service Network</title>
     <link rel="stylesheet" href="/css/main.css">
 </head>
+
+<% const messages = flash(); %>
+<% Object.keys(messages).forEach(type => { %>
+    <% if (messages[type].length > 0) { %>
+        <% messages[type].forEach(msg => { %>
+            <div class="alert <%= type %>" role="alert">
+                <%= msg %>
+            </div>
+        <% }); %>
+    <% } %>
+<% }); %>
+
 <body>
     <header class="site-header">
         <div class="header-container">

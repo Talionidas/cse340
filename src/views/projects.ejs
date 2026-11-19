@@ -3,6 +3,10 @@
 <main>
     <h1><%= title %></h1>
 
+    <p>
+        <a href="/new-project">Add a New Service Project</a>
+    </p>
+
     <% if (projects.length > 0) { %>
         <ul>
             <% projects.forEach(project => { %>
@@ -14,7 +18,12 @@
                     </h2>
 
                     <p><%= project.description %></p>
-                    <p>Date: <%= new Date(project.date).toLocaleDateString('en-US') %></p>
+
+                    <p>
+                        Date:
+                        <%= new Date(project.date).toLocaleDateString('en-US') %>
+                    </p>
+
                     <p>Location: <%= project.location %></p>
 
                     <p>
@@ -27,7 +36,7 @@
             <% }); %>
         </ul>
     <% } else { %>
-        <p>There are currently no upcoming service projects.</p>
+        <p>No upcoming service projects are currently available.</p>
     <% } %>
 </main>
 
