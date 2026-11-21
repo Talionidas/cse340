@@ -32,6 +32,41 @@ const getCategoriesByProjectId = async (projectId) => {
     return result.rows;
 };
 
+const createCategory = async (name) => {
+    const query = `
+        INSERT INTO public.category (name)
+        VALUES ($1)
+        RETURNING category_id;
+    `;
+    const result = await db.query(query, [name]);
+    if (result.rows.length === 0) {
+        throw new Error('Failed to create category');
+    }
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log('Created category with ID:', result.rows[0].category_id);
+    }
+    return result.rows[0].category_id;
+};
+
+const updateCategory = async (categoryId, name) => {
+    const query = `
+        UPDATE public.category
+        SET name = $1
+        WHERE category_id = $2
+        RETURNING category_id;
+    `;
+    const result = await db.query(query, [name, categoryId]);
+    if (result.rows.length === 0) {
+        const error = new Error('Category Not Found');
+        error.status = 404;
+        throw error;
+    }
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+        console.log('Updated category with ID:', result.rows[0].category_id);
+    }
+    return result.rows[0].category_id;
+};
+
 const assignCategoryToProject = async (projectId, categoryId, client = db) => {
     const query = `
         INSERT INTO public.project_category (project_id, category_id)
@@ -42,25 +77,18 @@ const assignCategoryToProject = async (projectId, categoryId, client = db) => {
 
 const updateCategoryAssignments = async (projectId, categoryIds) => {
     const client = await db.connect();
-
     try {
         await client.query('BEGIN');
-
-        const deleteQuery = `
+        await client.query(`
             DELETE FROM public.project_category
             WHERE project_id = $1;
-        `;
-        await client.query(deleteQuery, [projectId]);
+        `, [projectId]);
 
         for (const categoryId of categoryIds) {
             await assignCategoryToProject(projectId, categoryId, client);
         }
 
         await client.query('COMMIT');
-
-        if (process.env.ENABLE_SQL_LOGGING === 'true') {
-            console.log('Updated categories for project ID:', projectId);
-        }
     } catch (error) {
         await client.query('ROLLBACK');
         throw error;
@@ -73,5 +101,7 @@ export {
     getAllCategories,
     getCategoryDetails,
     getCategoriesByProjectId,
+    createCategory,
+    updateCategory,
     updateCategoryAssignments
 };
