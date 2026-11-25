@@ -13,22 +13,29 @@ const organizationValidation = [
         .notEmpty()
         .withMessage('Organization name is required')
         .isLength({ min: 3, max: 150 })
-        .withMessage('Organization name must be between 3 and 150 characters')
-        .escape(),
+        .withMessage('Organization name must be between 3 and 150 characters'),
     body('description')
         .trim()
         .notEmpty()
         .withMessage('Organization description is required')
         .isLength({ max: 500 })
-        .withMessage('Organization description cannot exceed 500 characters')
-        .escape(),
+        .withMessage('Organization description cannot exceed 500 characters'),
     body('contactEmail')
         .trim()
         .notEmpty()
         .withMessage('Contact email is required')
+        .isLength({ max: 255 })
+        .withMessage('Contact email cannot exceed 255 characters')
         .isEmail()
         .withMessage('Please provide a valid email address')
-        .normalizeEmail()
+        .normalizeEmail(),
+    body('logoFilename')
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage('Logo filename is required')
+        .isLength({ max: 255 })
+        .withMessage('Logo filename cannot exceed 255 characters')
 ];
 
 const showOrganizationsPage = async (req, res, next) => {
@@ -141,6 +148,13 @@ const processEditOrganizationForm = async (req, res, next) => {
             return res.redirect(`/edit-organization/${organizationId}`);
         }
 
+        const organization = await getOrganizationDetails(organizationId);
+        if (!organization) {
+            const error = new Error('Organization Not Found');
+            error.status = 404;
+            return next(error);
+        }
+
         const { name, description, contactEmail, logoFilename } = req.body;
 
         await updateOrganization(
@@ -148,7 +162,7 @@ const processEditOrganizationForm = async (req, res, next) => {
             name,
             description,
             contactEmail,
-            logoFilename
+            logoFilename ?? organization.logo_filename
         );
 
         req.flash('success', 'Organization updated successfully!');
