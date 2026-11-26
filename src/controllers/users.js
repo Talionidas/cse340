@@ -21,8 +21,8 @@ const registrationValidation = [
     body('password')
         .isString()
         .bail()
-        .isLength({ min: 8 })
-        .withMessage('Password must be at least 8 characters')
+        .isLength({ min: 7 })
+        .withMessage('Password must be at least 7 characters')
         .custom(password => Buffer.byteLength(password, 'utf8') <= 72)
         .withMessage('Password cannot exceed 72 bytes')
 ];
@@ -112,6 +112,32 @@ const requireLogin = (req, res, next) => {
     next();
 };
 
+/**
+ * Middleware factory to require specific role for route access
+ * Returns middleware that checks if user has the required role
+ *
+ * @param {string} role - The role name required (e.g., 'admin', 'user')
+ * @returns {Function} Express middleware function
+ */
+const requireRole = (role) => {
+    return (req, res, next) => {
+        // Check if user is logged in first
+        if (!req.session || !req.session.user) {
+            req.flash('error', 'You must be logged in to access this page.');
+            return res.redirect('/login');
+        }
+
+        // Check if user's role matches the required role
+        if (req.session.user.role_name !== role) {
+            req.flash('error', 'You do not have permission to access this page.');
+            return res.redirect('/');
+        }
+
+        // User has required role, continue
+        next();
+    };
+};
+
 const showDashboard = (req, res) => {
     const user = req.session.user;
     res.render('dashboard', {
@@ -129,5 +155,6 @@ export {
     processLoginForm,
     processLogout,
     requireLogin,
+    requireRole,
     showDashboard
 };

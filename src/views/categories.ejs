@@ -3,9 +3,11 @@
 <main>
     <h1><%= title %></h1>
 
-    <p>
-        <a href="/new-category">Add a New Category</a>
-    </p>
+    <% if (user && user.role_name === 'admin') { %>
+        <p>
+            <a href="/new-category">Add a New Category</a>
+        </p>
+    <% } %>
 
     <% if (categories.length > 0) { %>
         <ul>
@@ -14,10 +16,12 @@
                     <a href="/category/<%= category.category_id %>">
                         <%= category.name %>
                     </a>
-                    -
-                    <a href="/edit-category/<%= category.category_id %>">
-                        Edit
-                    </a>
+                    <% if (user && user.role_name === 'admin') { %>
+                        -
+                        <a href="/edit-category/<%= category.category_id %>">
+                            Edit
+                        </a>
+                    <% } %>
                 </li>
             <% }); %>
         </ul>
